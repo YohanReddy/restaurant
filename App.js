@@ -2,20 +2,22 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Home from "./screens/home";
-import Available from "./screens/available";
-import { useNavigation } from "@react-navigation/native";
+import SelectedDataScreen from "./screens/SelectedDataScreen";
 
 const Stack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
           options={{ headerShown: false }}
           name="Home"
           component={Home}
         />
-        <Stack.Screen name="Available" component={Available} />
+        <Stack.Screen
+          name="SelectedDataScreen"
+          component={SelectedDataScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

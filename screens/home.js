@@ -1,111 +1,163 @@
-import { Text, View, SafeAreaView, TouchableOpacity } from "react-native";
-import React, { useState, useEffect } from "react";
-import firebase from "firebase/compat/app";
-import "firebase/compat/firestore";
-import { Entypo } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { styles } from "../styles";
-import { useNavigation } from "@react-navigation/native";
+import React, { useState } from "react";
+import {
+  View,
+  TextInput,
+  Button,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAltLPQpfpqASjP44KIc0-uy43h9geAFjs",
-  authDomain: "react-food-app-test.firebaseapp.com",
-  databaseURL: "https://react-food-app-test-default-rtdb.firebaseio.com",
-  projectId: "react-food-app-test",
-  storageBucket: "react-food-app-test.appspot.com",
-  messagingSenderId: "917792936106",
-  appId: "1:917792936106:web:305454d4f351eeedd840d3",
-  measurementId: "G-9320K6BHRK",
-};
+const YourComponent = ({ navigation }) => {
+  const [fname, setFirstName] = useState("");
+  const [lname, setLastName] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [branchID, setBranchID] = useState("");
+  const [interested_country, setInterestedCountry] = useState("");
+  const [interested_university, setInterestedUniversity] = useState("");
+  const [intake, setIntake] = useState("");
 
-firebase.initializeApp(firebaseConfig);
+  const [selectedData, setSelectedData] = useState(null);
 
-const Home = () => {
-  const [documentData, setDocumentData] = useState(null);
+  const sendDataToApi = async () => {
+    try {
+      const apiUrl =
+        "https://two.areksoft.com/recordrr/auth/check.service?oauth_id=dede65fb9142a2a977bbbe709d3961ea202303301037131557503&secret_key=8c514619025105c61d8e3608597eb2234b1e95556c5dba2266f24ea9e62640505531a5834816222280f20d1ef9e95f69&api_service_id=customer.api&api_command=register.api&session_token=d41d8cd98f00b204e9800998ecf8427e8669a641c5103a3d5b0041424bc3ae2520231013112605&login_token=f1b450c03ef7e4593517e550c5c35204&";
+      const queryParams = `fname=${fname}&lname=${lname}&email&mobile=${mobile}&vendor_id=1&branch_id=${branchID}&admin_id=131&lead_status=1&source=Facebook&country_code=91&event_id&event_checked_in&transfer_no&alt_country_code&alt_mobile&reference=Dilip&mname=api&interested_country=${interested_country}&campaign_name=Api Camp&sub_campaign_name=API Sub&label=53&interested_university=${interested_university}&current_university=Arizona State University&intake=${intake}`;
+      const fullUrl = apiUrl + queryParams;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const db = firebase.firestore();
-      const docRef = db.collection("collection").doc("document");
+      const response = await fetch(fullUrl, {
+        method: "GET",
+      });
 
-      try {
-        const doc = await docRef.get();
-        if (doc.exists) {
-          setDocumentData(doc.data());
-        } else {
-          console.log("No such document!");
-        }
-      } catch (error) {
-        console.log("Error getting document:", error);
+      const responseData = await response.json();
+
+      // Check if responseData is an array and not empty
+      if (Array.isArray(responseData) && responseData.length > 0) {
+        // Extracting selected fields from the first item in the array
+        const newSelectedData = {
+          fname: responseData[0].fname,
+          lname: responseData[0].lname,
+          mobile: responseData[0].mobile,
+          branchID: responseData[0].branch,
+          interested_university: responseData[0].interested_university,
+          interested_country: responseData[0].interested_country,
+        };
+
+        setSelectedData(newSelectedData);
+
+        console.log("Selected Data:", newSelectedData);
+      } else {
+        console.error(
+          "Invalid response format. Expected an array with at least one item."
+        );
       }
-    };
-
-    fetchData();
-  }, []);
-
-  const navigation = useNavigation();
+    } catch (error) {
+      console.error("Error sending data to API:", error);
+    }
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>My Restaurant</Text>
-
-      <View style={styles.box}>
-        <View style={{ flex: 1, flexDirection: "row" }}>
-          <Text style={styles.boxText}>Complete orders</Text>
-          <Text style={styles.greenText}> +20 since yesterday</Text>
-        </View>
-        {documentData ? (
-          <Text style={styles.boxText}>
-            {documentData.ordersCompleted} Today
-          </Text>
-        ) : (
-          <Text>Loading...</Text>
-        )}
+    <View style={styles.container}>
+      <Text style={styles.sample}>Sample Form Test</Text>
+      <View style={styles.nameRow}>
+        <TextInput
+          style={styles.TextInput}
+          placeholder="First Name"
+          value={fname}
+          onChangeText={(text) => setFirstName(text)}
+        />
+        <TextInput
+          style={styles.TextInput}
+          placeholder="Last Name"
+          value={lname}
+          onChangeText={(text) => setLastName(text)}
+        />
+      </View>
+      <View style={styles.nameRow}>
+        <TextInput
+          style={styles.BigInput}
+          placeholder="Mobile"
+          value={mobile}
+          onChangeText={(text) => setMobile(text)}
+        />
+      </View>
+      <View style={styles.nameRow}>
+        <TextInput
+          style={styles.TextInput}
+          placeholder="Intake"
+          value={intake}
+          onChangeText={(text) => setIntake(text)}
+        />
+        <TextInput
+          style={styles.TextInput}
+          placeholder="Branch ID"
+          value={branchID}
+          onChangeText={(text) => setBranchID(text)}
+        />
+      </View>
+      <View style={styles.nameRow}>
+        <TextInput
+          style={styles.BigInput}
+          placeholder="Interested Country"
+          value={interested_country}
+          onChangeText={(text) => setInterestedCountry(text)}
+        />
+      </View>
+      <View style={styles.nameRow}>
+        <TextInput
+          style={styles.BigInput}
+          placeholder="Interested University"
+          value={interested_university}
+          onChangeText={(text) => setInterestedUniversity(text)}
+        />
       </View>
 
-      <View style={styles.tablesRow}>
-        <TouchableOpacity onPress={() => navigation.navigate("Available")}>
-          <View style={styles.tables}>
-            <Text style={styles.tablesTitle}>Available Tables</Text>
-            {documentData ? (
-              <Text style={styles.tablesText}>
-                {documentData.availableTables}
-              </Text>
-            ) : (
-              <></>
-            )}
-          </View>
-        </TouchableOpacity>
-        <View style={styles.tables}>
-          <Text style={styles.tablesTitle}>Occupied tables</Text>
-          {documentData ? (
-            <Text style={styles.tablesText}>{documentData.occupiedTables}</Text>
-          ) : (
-            <></>
-          )}
-        </View>
-      </View>
-
-      <View style={styles.detailsRow}>
-        <View style={styles.menu}>
-          <Text style={styles.styledText}>Menu</Text>
-          <Entypo name="bowl" size={20} color="black" />
-        </View>
-        <View style={styles.miniBox}>
-          <Text style={styles.styledText}>Employees</Text>
-          <Text style={styles.bigText}>9</Text>
-        </View>
-        <View style={styles.miniBox}>
-          <Text style={styles.styledText}>Offers</Text>
-          <MaterialCommunityIcons
-            name="brightness-percent"
-            size={24}
-            color="black"
-          />
-        </View>
-      </View>
-    </SafeAreaView>
+      <Button title="Submit Interest" onPress={sendDataToApi} />
+      <Button
+        title="Go to Dashboard"
+        onPress={() =>
+          navigation.navigate("SelectedDataScreen", { selectedData })
+        }
+      />
+    </View>
   );
 };
 
-export default Home;
+// Styles
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 60,
+    flex: 1,
+    gap: 10,
+    marginTop: 90,
+    alignSelf: "center",
+  },
+  TextInput: {
+    borderWidth: 1,
+    borderRadius: 5,
+    width: 150,
+    height: 50,
+    padding: 10,
+  },
+  BigInput: {
+    width: 310,
+    borderWidth: 1,
+    borderRadius: 5,
+    height: 50,
+    padding: 10,
+  },
+  nameRow: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  sample: {
+    fontSize: 25,
+    alignSelf: "center",
+    fontWeight: "bold",
+    marginBottom: 15,
+  },
+});
+
+export default YourComponent;
